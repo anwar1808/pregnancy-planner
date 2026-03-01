@@ -25,7 +25,7 @@ TRIM_WHITE   = HexColor("#d8d8d8")   # muted white for trimester sublabel
 
 # ── Layout constants ──────────────────────────────────────────────────────────
 MARGIN_X  = 20 * mm          # left/right body margin
-CONTENT_W = PAGE_W - 2 * MARGIN_X
+CONTENT_W = PAGE_W - 2 * MARGIN_X - 22   # reduced by 22pt for side tabs
 
 BAND_H          = 30          # sage header band height (pt)
 BAND_FONT       = 12          # "Week 18" font size
@@ -50,10 +50,80 @@ BOTTOM_MARGIN   = 22          # pt from page bottom
 
 BODY_START      = BAND_H + 22  # pt from page top where body begins
 
+# ── Side nav tab definitions ──────────────────────────────────────────────────
+TABS = [
+    (0, "START",       "dest_start"),
+    (1, "TRIM 1",      "dest_trim1"),
+    (2, "TRIM 2",      "dest_trim2"),
+    (3, "TRIM 3",      "dest_trim3"),
+    (4, "APPTS",       "dest_appts"),
+    (5, "CHECKLISTS",  "dest_checklists"),
+    (6, "HEALTH",      "dest_health"),
+    (7, "JOURNAL",     "dest_journal"),
+    (8, "NOTES",       "dest_notes"),
+]
+
+TAB_W    = 18    # tab width (pt)
+TAB_H    = 60    # tab height (pt)
+TAB_GAP  = 2     # gap between tabs (pt)
+TAB_X    = PAGE_W - TAB_W   # left edge of tab strip
+
+# total height of all 9 tabs + gaps
+_TAB_TOTAL_H = 9 * TAB_H + 8 * TAB_GAP
+_TAB_START_Y = (PAGE_H - _TAB_TOTAL_H) / 2   # bottom-relative y of the lowest tab bottom
+
+
 # ── Coordinate helper ─────────────────────────────────────────────────────────
 def rl(top_y):
     """Convert top-relative y to ReportLab bottom-relative y."""
     return PAGE_H - top_y
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SIDE NAV TABS
+# ─────────────────────────────────────────────────────────────────────────────
+
+def draw_side_tabs(c, active_idx):
+    """Draw 9 side navigation tabs on the right edge of the page."""
+    inactive_fill = HexColor("#ece6de")
+
+    for i, (tab_idx, label, dest_name) in enumerate(TABS):
+        # tabs are drawn top-to-bottom, so index 0 is at the top
+        # bottom-relative y of this tab's bottom edge
+        tab_bottom = _TAB_START_Y + (8 - i) * (TAB_H + TAB_GAP)
+        tab_top    = tab_bottom + TAB_H
+
+        if tab_idx == active_idx:
+            fill_color = SAGE
+            text_color = white
+        else:
+            fill_color = inactive_fill
+            text_color = TEXT_SEC
+
+        c.setFillColor(fill_color)
+        c.setStrokeColor(fill_color)
+        c.setLineWidth(0)
+        c.rect(TAB_X, tab_bottom, TAB_W, TAB_H, fill=1, stroke=0)
+
+        # Rotated text centred in the tab
+        c.saveState()
+        cx = TAB_X + TAB_W / 2
+        cy = tab_bottom + TAB_H / 2
+        c.translate(cx, cy)
+        c.rotate(90)
+        c.setFont("Helvetica", 6)
+        c.setFillColor(text_color)
+        c.drawCentredString(0, -2, label)
+        c.restoreState()
+
+        # Clickable link rectangle
+        c.linkRect(
+            '',
+            dest_name,
+            (TAB_X, tab_bottom, TAB_X + TAB_W, tab_top),
+            relative=0,
+            Border=[0, 0, 0],
+        )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -224,79 +294,106 @@ def get_trimester(week):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# WEEKLY PAGE
-# ─────────────────────────────────────────────────────────────────────────────
-
-def draw_weekly_page(c, week_num, tasks):
-    c.setFillColor(white)
-    c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
-
-    trimester = get_trimester(week_num)
-    draw_sage_band(c, label=f"Week {week_num}", sublabel=trimester)
-
-    cur_y = BODY_START
-
-    # ── THIS WEEK ──────────────────────────────────────────────────────────
-    cur_y = draw_section_header(c, "THIS WEEK", cur_y)
-    for task in tasks:
-        cur_y = draw_task_row(c, cur_y, text=task, prefilled=True)
-    for _ in range(3):
-        cur_y = draw_task_row(c, cur_y, prefilled=False)
-
-    # ── HABITS ────────────────────────────────────────────────────────────
-    cur_y += SECTION_GAP
-    cur_y = draw_section_header(c, "HABITS", cur_y)
-    cur_y = draw_habit_tracker(c, cur_y, rows=4)
-
-    # ── HOW ARE YOU FEELING? ──────────────────────────────────────────────
-    cur_y += SECTION_GAP
-    cur_y = draw_section_header(c, "HOW ARE YOU FEELING?", cur_y)
-    cur_y = draw_note_lines(c, 4, cur_y)
-
-    # ── NOTES: fill remaining space ────────────────────────────────────────
-    cur_y += SECTION_GAP - 6
-    cur_y = draw_section_header(c, "NOTES", cur_y)
-    available = PAGE_H - BOTTOM_MARGIN - rl(cur_y)   # remaining pt above bottom margin
-    note_count = max(3, int(available / NOTE_SPACING))
-    draw_note_lines(c, note_count, cur_y)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
 # COVER PAGE
 # ─────────────────────────────────────────────────────────────────────────────
 
 def draw_cover(c):
-    c.setFillColor(white)
+    # Full-page sage green background
+    c.setFillColor(SAGE)
     c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
 
-    # Large sage top strip
-    strip_h = 180
-    c.setFillColor(SAGE)
-    c.rect(0, PAGE_H - strip_h, PAGE_W, strip_h, fill=1, stroke=0)
-
-    # Title
-    c.setFillColor(white)
-    c.setFont("Helvetica-Bold", 26)
-    c.drawCentredString(PAGE_W / 2, PAGE_H - strip_h / 2 - 10, "PREGNANCY PLANNER")
-
-    # Subtitle inside strip
-    c.setFillColor(TRIM_WHITE)
-    c.setFont("Helvetica", 11)
-    c.drawCentredString(PAGE_W / 2, PAGE_H - strip_h / 2 + 22, "Your week-by-week guide to feeling prepared")
-
-    # Thin rule below strip
-    c.setStrokeColor(LINE_MED)
+    # Decorative thin horizontal line above title
+    title_y_rl = PAGE_H / 2 + 20   # bottom-relative y of title baseline
+    c.setStrokeColor(white)
     c.setLineWidth(0.6)
-    c.line(50, PAGE_H - strip_h - 28, PAGE_W - 50, PAGE_H - strip_h - 28)
+    c.line(80, title_y_rl + 50, PAGE_W - 80, title_y_rl + 50)
 
-    # "Weeks 4 – 40"
-    c.setFillColor(TEXT_SEC)
+    # White centred title
+    c.setFillColor(white)
+    c.setFont("Helvetica-Bold", 30)
+    c.drawCentredString(PAGE_W / 2, title_y_rl, "PREGNANCY PLANNER")
+
+    # Subtitle
+    c.setFillColor(TRIM_WHITE)
+    c.setFont("Helvetica", 12)
+    c.drawCentredString(PAGE_W / 2, title_y_rl - 24, "Your week-by-week guide to feeling prepared")
+
+    # Decorative thin horizontal line below subtitle
+    c.setStrokeColor(white)
+    c.setLineWidth(0.6)
+    c.line(80, title_y_rl - 44, PAGE_W - 80, title_y_rl - 44)
+
+    # Bottom: "WEEKS 4 – 40" small text
+    c.setFillColor(white)
     c.setFont("Helvetica", 9)
-    c.drawCentredString(PAGE_W / 2, PAGE_H - strip_h - 50, "WEEKS 4 – 40")
+    c.drawCentredString(PAGE_W / 2, BOTTOM_MARGIN + 10, "WEEKS 4 – 40")
 
-    # Bottom sage bar
-    c.setFillColor(SAGE)
-    c.rect(0, 0, PAGE_W, 8, fill=1, stroke=0)
+    # No side tabs on the cover (no active section yet)
+    draw_side_tabs(c, 0)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CONTENTS PAGE
+# ─────────────────────────────────────────────────────────────────────────────
+
+def draw_contents_page(c):
+    c.setFillColor(white)
+    c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
+    draw_sage_band(c, label="Contents")
+    draw_side_tabs(c, 0)
+
+    mx = MARGIN_X
+    cw = CONTENT_W
+    cur_y = BODY_START + 10
+
+    def dot_leader_row(label, indent=0, size=10, bold=False):
+        nonlocal cur_y
+        font = "Helvetica-Bold" if bold else "Helvetica"
+        c.setFont(font, size)
+        c.setFillColor(TEXT_DARK if bold else TEXT_DARK)
+        c.drawString(mx + indent, rl(cur_y), label)
+        # dot leader
+        label_w = c.stringWidth(label, font, size)
+        dot_x = mx + indent + label_w + 4
+        right_x = mx + cw - 2
+        c.setFillColor(TEXT_SEC)
+        c.setFont("Helvetica", 8)
+        x = dot_x
+        while x < right_x - 6:
+            c.drawString(x, rl(cur_y) + 1, ".")
+            x += 6
+        cur_y += size + 8
+
+    def sub_row(label, indent=16):
+        nonlocal cur_y
+        c.setFont("Helvetica", 9)
+        c.setFillColor(TEXT_SEC)
+        c.drawString(mx + indent, rl(cur_y), label)
+        label_w = c.stringWidth(label, "Helvetica", 9)
+        dot_x = mx + indent + label_w + 4
+        right_x = mx + cw - 2
+        x = dot_x
+        while x < right_x - 6:
+            c.drawString(x, rl(cur_y) + 1, ".")
+            x += 6
+        cur_y += 9 + 6
+
+    sections = [
+        ("Getting Started", False, []),
+        ("What Your Planner Includes", False, []),
+        ("Planning", False, ["Trimester Planning", "Week-by-Week Pages"]),
+        ("Habit Tracking", False, []),
+        ("Appointment Logs", False, []),
+        ("Checklists", False, ["Baby Preparation", "Home Preparation", "Hospital Bag", "Postpartum Prep"]),
+        ("Journal", False, []),
+        ("Notes", False, []),
+    ]
+
+    for (label, bold, subs) in sections:
+        dot_leader_row(label, bold=True)
+        for sub in subs:
+            sub_row(sub)
+        cur_y += 4
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -308,6 +405,7 @@ def draw_about_page(c):
     c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
 
     draw_sage_band(c, label="About This Planner")
+    draw_side_tabs(c, 0)
 
     mx = MARGIN_X
     cw = CONTENT_W
@@ -357,14 +455,140 @@ def draw_about_page(c):
                              font="Helvetica", size=10, leading=15)
         cur_y += 4
 
+    # Rule before navigation section
+    cur_y += 8
+    c.setStrokeColor(LINE_MED)
+    c.setLineWidth(0.5)
+    c.line(mx, rl(cur_y), mx + cw, rl(cur_y))
+    cur_y += 20
+
+    cur_y = draw_section_header(c, "NAVIGATING YOUR PLANNER", cur_y, mx, cw)
+
+    nav_bullets = [
+        "Use the tabs on the right edge of each page to jump between sections.",
+        "Tap a tab while in Read Only mode (toggle off the pen tool) to follow the link.",
+        "To add more pages, duplicate any page: press and hold the page thumbnail, then select Duplicate.",
+    ]
+
+    for bullet in nav_bullets:
+        dot_y = rl(cur_y + 4)
+        c.setFillColor(SAGE)
+        c.circle(mx + 4, dot_y, 2.5, fill=1, stroke=0)
+        cur_y = draw_wrapped(c, bullet, mx + 13, cur_y, cw - 13,
+                             font="Helvetica", size=10, leading=15)
+        cur_y += 4
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TRIMESTER TITLE PAGE
+# ─────────────────────────────────────────────────────────────────────────────
+
+def draw_trimester_title_page(c, trimester_name, week_range, active_tab_idx):
+    """Full sage green trimester title page."""
+    c.setFillColor(SAGE)
+    c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
+
+    # Trimester name (small, top)
+    c.setFillColor(white)
+    c.setFont("Helvetica", 11)
+    c.drawCentredString(PAGE_W / 2, PAGE_H - 80, trimester_name.upper())
+
+    # Decorative thin line above week range
+    mid_y = PAGE_H / 2
+    c.setStrokeColor(white)
+    c.setLineWidth(0.6)
+    c.line(80, mid_y + 55, PAGE_W - 80, mid_y + 55)
+
+    # Week range (large, centred vertically)
+    c.setFillColor(white)
+    c.setFont("Helvetica-Bold", 48)
+    c.drawCentredString(PAGE_W / 2, mid_y, week_range)
+
+    # Decorative thin line below
+    c.setStrokeColor(white)
+    c.setLineWidth(0.6)
+    c.line(80, mid_y - 30, PAGE_W - 80, mid_y - 30)
+
+    draw_side_tabs(c, active_tab_idx)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TRIMESTER CALENDAR PAGE
+# ─────────────────────────────────────────────────────────────────────────────
+
+def draw_trimester_calendar(c, trimester_name, start_week, end_week, active_tab_idx):
+    """At-a-glance calendar grid for a trimester."""
+    c.setFillColor(white)
+    c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
+    draw_sage_band(c, label=f"{trimester_name} \u2014 At a Glance")
+    draw_side_tabs(c, active_tab_idx)
+
+    mx = MARGIN_X
+    cw = CONTENT_W
+    cur_y = BODY_START + 6
+
+    num_weeks = end_week - start_week + 1
+    week_label_w = 30
+    day_area_w = cw - week_label_w
+    cell_w = day_area_w / 7
+
+    # Available height for grid (leave room for notes section at bottom)
+    notes_area_h = 60
+    grid_h = PAGE_H - cur_y - BOTTOM_MARGIN - notes_area_h - 20
+    cell_h = grid_h / (num_weeks + 1)   # +1 for header row
+
+    grid_x = mx + week_label_w
+    grid_top = cur_y
+
+    days = ["M", "T", "W", "T", "F", "S", "S"]
+
+    # Day headers row
+    c.setFont("Helvetica-Bold", 7)
+    c.setFillColor(TEXT_SEC)
+    for i, d in enumerate(days):
+        cx = grid_x + i * cell_w + cell_w / 2
+        c.drawCentredString(cx, rl(grid_top + cell_h * 0.65), d)
+    grid_top += cell_h
+
+    # Week rows
+    for row_idx, wk in enumerate(range(start_week, end_week + 1)):
+        row_top = grid_top + row_idx * cell_h
+
+        # Week label
+        c.setFont("Helvetica", 7)
+        c.setFillColor(TEXT_SEC)
+        c.drawString(mx, rl(row_top + cell_h * 0.6), f"Wk {wk}")
+
+        # 7 day cells
+        for col in range(7):
+            cell_x = grid_x + col * cell_w
+            cell_y_rl = rl(row_top + cell_h) + 1
+            c.setStrokeColor(HABIT_BORDER)
+            c.setFillColor(white)
+            c.setLineWidth(0.5)
+            c.roundRect(cell_x + 1, cell_y_rl, cell_w - 2, cell_h - 2, 2, fill=1, stroke=1)
+
+    # Small NOTES section at bottom
+    notes_top = grid_top + num_weeks * cell_h + 14
+    cur_y = draw_section_header(c, "NOTES", notes_top, mx, cw)
+    draw_note_lines(c, 4, cur_y, spacing=13, margin_x=mx, content_w=cw)
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TRIMESTER PREAMBLE
 # ─────────────────────────────────────────────────────────────────────────────
 
-def draw_trimester_preamble(c, trimester_name, week_range, opening, body_text):
+TRIM_HABITS = {
+    1: ["e.g. Take folic acid daily", "e.g. Rest when you need to"],
+    2: ["e.g. Gentle exercise", "e.g. Track baby movements"],
+    3: ["e.g. Practise breathing techniques", "e.g. Prepare freezer meals"],
+}
+
+
+def draw_trimester_preamble(c, trimester_name, week_range, opening, body_text, active_tab_idx, trim_num):
     c.setFillColor(white)
     c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
+    draw_side_tabs(c, active_tab_idx)
 
     # Large sage band
     band_h = 120
@@ -398,65 +622,209 @@ def draw_trimester_preamble(c, trimester_name, week_range, opening, body_text):
                              font="Helvetica", size=10.5, leading=17)
         cur_y += 12
 
+    # ── HABITS TO BUILD THIS TRIMESTER ────────────────────────────────────────
+    cur_y += 6
+    cur_y = draw_section_header(c, "HABITS TO BUILD THIS TRIMESTER", cur_y, mx, cw)
+
+    suggested = TRIM_HABITS.get(trim_num, [])
+    for suggestion in suggested:
+        dot_y = rl(cur_y + 4)
+        c.setFillColor(SAGE)
+        c.circle(mx + 4, dot_y, 2.5, fill=1, stroke=0)
+        c.setFont("Helvetica", 10)
+        c.setFillColor(TEXT_DARK)
+        c.drawString(mx + 13, rl(cur_y), suggestion)
+        cur_y += 16
+
+    cur_y += 8
+    # 4 free-write habit lines with name underline + circle tracker
+    cur_y = draw_habit_tracker(c, cur_y, margin_x=mx, content_w=cw, rows=4)
+
 
 # ─────────────────────────────────────────────────────────────────────────────
-# APPOINTMENT PAGE
+# WEEKLY PAGE — two-column layout
 # ─────────────────────────────────────────────────────────────────────────────
 
-def draw_appointment_page(c):
+def draw_weekly_page(c, week_num, tasks, active_tab_idx):
     c.setFillColor(white)
     c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
-    draw_sage_band(c, label="Appointments")
+
+    trimester = get_trimester(week_num)
+    draw_sage_band(c, label=f"Week {week_num}", sublabel=trimester)
+    draw_side_tabs(c, active_tab_idx)
+
+    # Column layout
+    left_col_w  = int(CONTENT_W * 0.45)   # ~207pt
+    col_gap     = 12
+    right_col_w = CONTENT_W - left_col_w - col_gap
+    lx          = MARGIN_X
+    rx          = MARGIN_X + left_col_w + col_gap
+
+    body_top = BODY_START
+    body_bottom = PAGE_H - BOTTOM_MARGIN
+    available_body_h = body_bottom - body_top
+
+    # ── LEFT COLUMN: Daily Planner ─────────────────────────────────────────
+    lcur_y = body_top
+    lcur_y = draw_section_header(c, "DAILY PLANNER", lcur_y, lx, left_col_w)
+
+    days_labels = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+    day_section_h = (available_body_h - (lcur_y - body_top)) / 7
+
+    for day_label in days_labels:
+        # Day label
+        c.setFont("Helvetica-Bold", 7)
+        c.setFillColor(DAY_COLOR)
+        c.drawString(lx, rl(lcur_y + 8), day_label)
+        lcur_y += 12
+
+        # 3 note lines per day
+        lines_per_day = 3
+        c.setStrokeColor(LINE_LIGHT)
+        c.setLineWidth(0.4)
+        for i in range(lines_per_day):
+            ly = rl(lcur_y + 14 * (i + 1))
+            c.line(lx, ly, lx + left_col_w, ly)
+        lcur_y += 14 * lines_per_day + 4
+
+    # ── RIGHT COLUMN ───────────────────────────────────────────────────────
+    rcur_y = body_top
+
+    # TO-DO LIST
+    rcur_y = draw_section_header(c, "TO-DO LIST", rcur_y, rx, right_col_w)
+    for task in tasks:
+        rcur_y = draw_task_row(c, rcur_y, text=task, prefilled=True, margin_x=rx, content_w=right_col_w)
+    # 7 free checkbox rows
+    for _ in range(7):
+        rcur_y = draw_task_row(c, rcur_y, prefilled=False, margin_x=rx, content_w=right_col_w)
+
+    # HABITS
+    rcur_y += SECTION_GAP - 8
+    rcur_y = draw_section_header(c, "HABITS", rcur_y, rx, right_col_w)
+    rcur_y = draw_habit_tracker(c, rcur_y, margin_x=rx, content_w=right_col_w, rows=4)
+
+    # HOW ARE YOU FEELING?
+    rcur_y += SECTION_GAP - 8
+    rcur_y = draw_section_header(c, "HOW ARE YOU FEELING?", rcur_y, rx, right_col_w)
+    rcur_y = draw_note_lines(c, 2, rcur_y, margin_x=rx, content_w=right_col_w)
+
+    # NOTES: fill remaining space
+    rcur_y += SECTION_GAP - 6
+    rcur_y = draw_section_header(c, "NOTES", rcur_y, rx, right_col_w)
+    available = PAGE_H - BOTTOM_MARGIN - rl(rcur_y)
+    note_count = max(2, int(available / NOTE_SPACING))
+    draw_note_lines(c, note_count, rcur_y, margin_x=rx, content_w=right_col_w)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# APPOINTMENTS TITLE PAGE
+# ─────────────────────────────────────────────────────────────────────────────
+
+def draw_appointments_title_page(c):
+    c.setFillColor(SAGE)
+    c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
+
+    c.setFillColor(white)
+    c.setFont("Helvetica-Bold", 36)
+    c.drawCentredString(PAGE_W / 2, PAGE_H / 2 + 20, "APPOINTMENTS")
+
+    c.setFillColor(TRIM_WHITE)
+    c.setFont("Helvetica", 12)
+    c.drawCentredString(PAGE_W / 2, PAGE_H / 2 - 10, "Keep track of every appointment")
+
+    # Decorative lines
+    c.setStrokeColor(white)
+    c.setLineWidth(0.6)
+    c.line(80, PAGE_H / 2 + 50, PAGE_W - 80, PAGE_H / 2 + 50)
+    c.line(80, PAGE_H / 2 - 30, PAGE_W - 80, PAGE_H / 2 - 30)
+
+    draw_side_tabs(c, 4)
+    c.bookmarkPage("dest_appts")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# APPOINTMENT FULL PAGE (one appointment per page)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def draw_appointment_full_page(c):
+    c.setFillColor(white)
+    c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
+    draw_sage_band(c, label="Appointment")
+    draw_side_tabs(c, 4)
 
     mx = MARGIN_X
     cw = CONTENT_W
     cur_y = BODY_START
 
+    def field_label(label_text, x, y, w):
+        c.setFont("Helvetica", SEC_FONT)
+        c.setFillColor(TEXT_SEC)
+        c.drawString(x, rl(y), label_text)
+        # underline
+        c.setStrokeColor(FREE_LINE)
+        c.setLineWidth(0.5)
+        c.line(x, rl(y + 16), x + w - 8, rl(y + 16))
+
+    # DATE (half) | TIME (half)
+    half = cw / 2
+    field_label("DATE", mx, cur_y, half)
+    field_label("TIME", mx + half, cur_y, half)
+    cur_y += 26
+
+    # WEEK (third) | TYPE (third) | LOCATION (third)
+    third = cw / 3
+    field_label("WEEK", mx, cur_y, third)
+    field_label("TYPE", mx + third, cur_y, third)
+    field_label("LOCATION", mx + 2 * third, cur_y, third)
+    cur_y += 26
+
+    # PROVIDER NAME (full width)
+    field_label("PROVIDER NAME", mx, cur_y, cw)
+    cur_y += 28
+
+    # QUESTIONS TO ASK
+    c.setFont("Helvetica", SEC_FONT)
+    c.setFillColor(TEXT_SEC)
+    c.drawString(mx, rl(cur_y), "QUESTIONS TO ASK")
+    cur_y += 12
+
     for _ in range(4):
-        # Block top rule
-        c.setStrokeColor(LINE_MED)
+        # question line
+        c.setStrokeColor(FREE_LINE)
         c.setLineWidth(0.5)
         c.line(mx, rl(cur_y), mx + cw, rl(cur_y))
-        cur_y += 12
+        cur_y += 14
+        # answer line (slightly indented)
+        c.setStrokeColor(LINE_LIGHT)
+        c.setLineWidth(0.4)
+        c.line(mx + 16, rl(cur_y), mx + cw, rl(cur_y))
+        cur_y += 16
 
-        # DATE / TYPE / LOCATION on one row
-        third = cw / 3
-        for fi, field in enumerate(["DATE", "TYPE", "LOCATION"]):
-            fx = mx + fi * third
-            c.setFont("Helvetica", SEC_FONT)
-            c.setFillColor(TEXT_SEC)
-            c.drawString(fx, rl(cur_y), field)
-            # underline
-            c.setStrokeColor(FREE_LINE)
-            c.setLineWidth(0.5)
-            c.line(fx, rl(cur_y + 14), fx + third - 12, rl(cur_y + 14))
-        cur_y += 26
+    cur_y += 6
 
-        # QUESTIONS
-        c.setFont("Helvetica", SEC_FONT)
-        c.setFillColor(TEXT_SEC)
-        c.drawString(mx, rl(cur_y), "QUESTIONS")
-        cur_y += 12
-        for _ in range(2):
-            c.setStrokeColor(FREE_LINE)
-            c.setLineWidth(0.5)
-            c.line(mx, rl(cur_y), mx + cw, rl(cur_y))
-            cur_y += 16
+    # NOTES
+    c.setFont("Helvetica", SEC_FONT)
+    c.setFillColor(TEXT_SEC)
+    c.drawString(mx, rl(cur_y), "NOTES")
+    cur_y += 12
+    for _ in range(5):
+        c.setStrokeColor(LINE_LIGHT)
+        c.setLineWidth(0.4)
+        c.line(mx, rl(cur_y), mx + cw, rl(cur_y))
+        cur_y += 16
 
-        cur_y += 6
+    cur_y += 6
 
-        # NOTES / OUTCOMES
-        c.setFont("Helvetica", SEC_FONT)
-        c.setFillColor(TEXT_SEC)
-        c.drawString(mx, rl(cur_y), "NOTES / OUTCOMES")
-        cur_y += 12
-        for _ in range(2):
-            c.setStrokeColor(LINE_LIGHT)
-            c.setLineWidth(0.5)
-            c.line(mx, rl(cur_y), mx + cw, rl(cur_y))
-            cur_y += 16
-
-        cur_y += 20
+    # NEXT STEPS
+    c.setFont("Helvetica", SEC_FONT)
+    c.setFillColor(TEXT_SEC)
+    c.drawString(mx, rl(cur_y), "NEXT STEPS")
+    cur_y += 12
+    for _ in range(3):
+        c.setStrokeColor(FREE_LINE)
+        c.setLineWidth(0.5)
+        c.line(mx, rl(cur_y), mx + cw, rl(cur_y))
+        cur_y += 16
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -503,6 +871,31 @@ def draw_col_header(c, label, top_y, mx):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# CHECKLISTS TITLE PAGE
+# ─────────────────────────────────────────────────────────────────────────────
+
+def draw_checklists_title_page(c):
+    c.setFillColor(SAGE)
+    c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
+
+    c.setFillColor(white)
+    c.setFont("Helvetica-Bold", 36)
+    c.drawCentredString(PAGE_W / 2, PAGE_H / 2 + 20, "CHECKLISTS")
+
+    c.setFillColor(TRIM_WHITE)
+    c.setFont("Helvetica", 12)
+    c.drawCentredString(PAGE_W / 2, PAGE_H / 2 - 10, "Stay organised, one step at a time")
+
+    c.setStrokeColor(white)
+    c.setLineWidth(0.6)
+    c.line(80, PAGE_H / 2 + 50, PAGE_W - 80, PAGE_H / 2 + 50)
+    c.line(80, PAGE_H / 2 - 30, PAGE_W - 80, PAGE_H / 2 - 30)
+
+    draw_side_tabs(c, 5)
+    c.bookmarkPage("dest_checklists")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # HOSPITAL BAG
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -510,6 +903,7 @@ def draw_hospital_bag(c):
     c.setFillColor(white)
     c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
     draw_sage_band(c, label="Hospital Bag")
+    draw_side_tabs(c, 5)
 
     gap   = 14
     col_w = (CONTENT_W - gap) / 2
@@ -527,6 +921,9 @@ def draw_hospital_bag(c):
         "Snacks", "Water bottle", "Pillow from home",
     ]:
         ly = draw_checklist_item(c, item, ly, lx, col_w)
+    # 10 free rows
+    for _ in range(10):
+        ly = draw_free_row(c, ly, lx, col_w)
 
     ry = draw_col_header(c, "FOR BABY", ry, rx)
     for item in [
@@ -535,6 +932,9 @@ def draw_hospital_bag(c):
         "Cotton wool / wipes", "Muslin cloths (x4)", "Car seat (in car)",
     ]:
         ry = draw_checklist_item(c, item, ry, rx, col_w)
+    # 10 free rows
+    for _ in range(10):
+        ry = draw_free_row(c, ry, rx, col_w)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -545,6 +945,7 @@ def draw_baby_essentials(c):
     c.setFillColor(white)
     c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
     draw_sage_band(c, label="Baby Essentials")
+    draw_side_tabs(c, 5)
 
     gap   = 14
     col_w = (CONTENT_W - gap) / 2
@@ -588,6 +989,7 @@ def draw_admin_work(c):
     c.setFillColor(white)
     c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
     draw_sage_band(c, label="Admin & Work")
+    draw_side_tabs(c, 5)
 
     mx    = MARGIN_X
     cw    = CONTENT_W
@@ -609,7 +1011,7 @@ def draw_admin_work(c):
             "Notify HMRC of new child",
             "Update will or insurance if needed",
             "Inform your employer of return date",
-            "Apply for childcare vouchers / free hours (15–30hrs)",
+            "Apply for childcare vouchers / free hours (15\u201330hrs)",
         ]),
     ]:
         cur_y = draw_col_header(c, header, cur_y, mx)
@@ -622,13 +1024,91 @@ def draw_admin_work(c):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# NOTES PAGES
+# HEALTH TITLE PAGE + LINED PAGES
 # ─────────────────────────────────────────────────────────────────────────────
+
+def draw_health_title_page(c):
+    c.setFillColor(SAGE)
+    c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
+
+    c.setFillColor(white)
+    c.setFont("Helvetica-Bold", 36)
+    c.drawCentredString(PAGE_W / 2, PAGE_H / 2 + 20, "HEALTH & WELLBEING")
+
+    c.setStrokeColor(white)
+    c.setLineWidth(0.6)
+    c.line(80, PAGE_H / 2 + 55, PAGE_W - 80, PAGE_H / 2 + 55)
+    c.line(80, PAGE_H / 2 - 10, PAGE_W - 80, PAGE_H / 2 - 10)
+
+    draw_side_tabs(c, 6)
+    c.bookmarkPage("dest_health")
+
+
+def draw_blank_lined_page(c, band_label, active_tab_idx):
+    c.setFillColor(white)
+    c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
+    draw_sage_band(c, label=band_label)
+    draw_side_tabs(c, active_tab_idx)
+
+    top     = BAND_H + 20 * mm
+    bottom  = BOTTOM_MARGIN + 20
+    spacing = NOTE_SPACING
+    count   = int((PAGE_H - top - bottom) / spacing)
+
+    c.setStrokeColor(LINE_LIGHT)
+    c.setLineWidth(0.4)
+    for i in range(count):
+        ly = PAGE_H - top - spacing * (i + 1)
+        c.line(MARGIN_X, ly, MARGIN_X + CONTENT_W, ly)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# JOURNAL TITLE PAGE
+# ─────────────────────────────────────────────────────────────────────────────
+
+def draw_journal_title_page(c):
+    c.setFillColor(SAGE)
+    c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
+
+    c.setFillColor(white)
+    c.setFont("Helvetica-Bold", 48)
+    c.drawCentredString(PAGE_W / 2, PAGE_H / 2 + 20, "JOURNAL")
+
+    c.setStrokeColor(white)
+    c.setLineWidth(0.6)
+    c.line(80, PAGE_H / 2 + 60, PAGE_W - 80, PAGE_H / 2 + 60)
+    c.line(80, PAGE_H / 2 - 10, PAGE_W - 80, PAGE_H / 2 - 10)
+
+    draw_side_tabs(c, 7)
+    c.bookmarkPage("dest_journal")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NOTES TITLE PAGE + NOTES PAGES
+# ─────────────────────────────────────────────────────────────────────────────
+
+def draw_notes_title_page(c):
+    c.setFillColor(SAGE)
+    c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
+
+    c.setFillColor(white)
+    c.setFont("Helvetica-Bold", 48)
+    c.drawCentredString(PAGE_W / 2, PAGE_H / 2 + 20, "NOTES")
+
+    c.setStrokeColor(white)
+    c.setLineWidth(0.6)
+    c.line(80, PAGE_H / 2 + 60, PAGE_W - 80, PAGE_H / 2 + 60)
+    c.line(80, PAGE_H / 2 - 10, PAGE_W - 80, PAGE_H / 2 - 10)
+
+    draw_side_tabs(c, 8)
+    c.bookmarkPage("dest_notes")
+
 
 def draw_notes_page(c, page_num):
     c.setFillColor(white)
     c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
     draw_sage_band(c, label="Notes")
+    draw_side_tabs(c, 8)
 
     top      = BAND_H + 20 * mm
     bottom   = BOTTOM_MARGIN + 20
@@ -723,42 +1203,124 @@ def build_pdf():
     path = "/Users/annie/pregnancy_planner_2026.pdf"
     c = canvas.Canvas(path, pagesize=(PAGE_W, PAGE_H))
 
-    draw_cover(c);                                                  c.showPage()
-    draw_about_page(c);                                             c.showPage()
+    # ── Cover ──────────────────────────────────────────────────────────────
+    c.bookmarkPage("dest_start")
+    draw_cover(c)
+    c.showPage()
 
-    draw_trimester_preamble(c, "First Trimester",  "Weeks 1 – 12",
+    # ── Contents ───────────────────────────────────────────────────────────
+    draw_contents_page(c)
+    c.showPage()
+
+    # ── About ──────────────────────────────────────────────────────────────
+    draw_about_page(c)
+    c.showPage()
+
+    # ── FIRST TRIMESTER ────────────────────────────────────────────────────
+    c.bookmarkPage("dest_trim1")
+    draw_trimester_title_page(c, "First Trimester", "Weeks 1 \u2013 12", active_tab_idx=1)
+    c.showPage()
+
+    draw_trimester_calendar(c, "First Trimester", 1, 12, active_tab_idx=1)
+    c.showPage()
+
+    draw_trimester_preamble(
+        c, "First Trimester", "Weeks 1 \u2013 12",
         "You might not look different yet, but everything is already changing.",
-        FIRST_TRIMESTER_BODY);                                      c.showPage()
+        FIRST_TRIMESTER_BODY, active_tab_idx=1, trim_num=1
+    )
+    c.showPage()
 
     for w in range(4, 13):
-        draw_weekly_page(c, w, WEEKLY_TASKS[w]);                    c.showPage()
+        draw_weekly_page(c, w, WEEKLY_TASKS[w], active_tab_idx=1)
+        c.showPage()
 
-    draw_trimester_preamble(c, "Second Trimester", "Weeks 13 – 26",
+    # ── SECOND TRIMESTER ───────────────────────────────────────────────────
+    c.bookmarkPage("dest_trim2")
+    draw_trimester_title_page(c, "Second Trimester", "Weeks 13 \u2013 26", active_tab_idx=2)
+    c.showPage()
+
+    draw_trimester_calendar(c, "Second Trimester", 13, 26, active_tab_idx=2)
+    c.showPage()
+
+    draw_trimester_preamble(
+        c, "Second Trimester", "Weeks 13 \u2013 26",
         "This is where most women find their breath again.",
-        SECOND_TRIMESTER_BODY);                                     c.showPage()
+        SECOND_TRIMESTER_BODY, active_tab_idx=2, trim_num=2
+    )
+    c.showPage()
 
     for w in range(13, 27):
-        draw_weekly_page(c, w, WEEKLY_TASKS[w]);                    c.showPage()
+        draw_weekly_page(c, w, WEEKLY_TASKS[w], active_tab_idx=2)
+        c.showPage()
 
-    draw_trimester_preamble(c, "Third Trimester",  "Weeks 27 – 40",
+    # ── THIRD TRIMESTER ────────────────────────────────────────────────────
+    c.bookmarkPage("dest_trim3")
+    draw_trimester_title_page(c, "Third Trimester", "Weeks 27 \u2013 40", active_tab_idx=3)
+    c.showPage()
+
+    draw_trimester_calendar(c, "Third Trimester", 27, 40, active_tab_idx=3)
+    c.showPage()
+
+    draw_trimester_preamble(
+        c, "Third Trimester", "Weeks 27 \u2013 40",
         "You're in the home stretch — and you're more ready than you feel.",
-        THIRD_TRIMESTER_BODY);                                      c.showPage()
+        THIRD_TRIMESTER_BODY, active_tab_idx=3, trim_num=3
+    )
+    c.showPage()
 
     for w in range(27, 41):
-        draw_weekly_page(c, w, WEEKLY_TASKS[w]);                    c.showPage()
+        draw_weekly_page(c, w, WEEKLY_TASKS[w], active_tab_idx=3)
+        c.showPage()
 
-    for _ in range(4):
-        draw_appointment_page(c);                                   c.showPage()
+    # ── APPOINTMENTS ───────────────────────────────────────────────────────
+    draw_appointments_title_page(c)
+    c.showPage()
 
-    draw_hospital_bag(c);                                           c.showPage()
-    draw_baby_essentials(c);                                        c.showPage()
-    draw_admin_work(c);                                             c.showPage()
+    for _ in range(10):
+        draw_appointment_full_page(c)
+        c.showPage()
+
+    # ── CHECKLISTS ─────────────────────────────────────────────────────────
+    draw_checklists_title_page(c)
+    c.showPage()
+
+    draw_hospital_bag(c)
+    c.showPage()
+
+    draw_baby_essentials(c)
+    c.showPage()
+
+    draw_admin_work(c)
+    c.showPage()
+
+    # ── HEALTH & WELLBEING ─────────────────────────────────────────────────
+    draw_health_title_page(c)
+    c.showPage()
+
+    for _ in range(3):
+        draw_blank_lined_page(c, "Health & Wellbeing", active_tab_idx=6)
+        c.showPage()
+
+    # ── JOURNAL ────────────────────────────────────────────────────────────
+    draw_journal_title_page(c)
+    c.showPage()
+
+    for _ in range(3):
+        draw_blank_lined_page(c, "Journal", active_tab_idx=7)
+        c.showPage()
+
+    # ── NOTES ──────────────────────────────────────────────────────────────
+    draw_notes_title_page(c)
+    c.showPage()
 
     for i in range(1, 5):
-        draw_notes_page(c, i);                                      c.showPage()
+        draw_notes_page(c, i)
+        c.showPage()
 
     c.save()
     print(f"Saved: {path}")
+
 
 if __name__ == "__main__":
     build_pdf()
