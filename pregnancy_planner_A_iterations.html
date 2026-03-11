@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pregnancy Planner – A Iterations</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #ede9e3;
+      font-family: 'Inter', sans-serif;
+      padding: 48px 24px 72px;
+      min-height: 100vh;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+
+    .page-header h1 {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 6px;
+    }
+
+    .page-header p {
+      font-size: 11px;
+      color: #aaa;
+      letter-spacing: 0.05em;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* 3:4 iPad portrait */
+    .page {
+      width: 264px;
+      height: 352px;
+      border-radius: 3px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      flex-shrink: 0;
+    }
+
+    .page:hover {
+      transform: translateY(-5px);
+    }
+
+    .variant-name {
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: 12px;
+      color: #555;
+      letter-spacing: 0.06em;
+    }
+
+    .variant-desc {
+      font-size: 10.5px;
+      color: #999;
+      text-align: center;
+      line-height: 1.6;
+      max-width: 230px;
+    }
+
+    /* ─── SHARED BASE (all three share this) ─── */
+    .page {
+      background: #ffffff;
+      box-shadow: 0 4px 24px rgba(80,100,80,0.12);
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Green band — half the original height */
+    .band {
+      flex-shrink: 0;
+      background: #7a9e7e;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 10px;
+    }
+
+    .band-tall   { height: 30px; }
+    .band-slim   { height: 22px; }
+    .band-stripe { height: 14px; }
+
+    .band .week {
+      font-size: 9px;
+      font-weight: 400;
+      color: #fff;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .band .sep {
+      width: 1px;
+      height: 10px;
+      background: rgba(255,255,255,0.35);
+    }
+
+    .band .trim {
+      font-size: 7px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      white-space: nowrap;
+    }
+
+    /* Body */
+    .body {
+      padding: 13px 20px 12px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Section headers */
+    .sec-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 7px;
+    }
+
+    .sec-label {
+      font-size: 6px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: #a09080;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .sec-line {
+      flex: 1;
+      height: 1px;
+      background: #e8e0d4;
+    }
+
+    /* Pre-filled tasks */
+    .task {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+
+    .box-clay {
+      width: 7px;
+      height: 7px;
+      border: 1.5px solid #c4956a;
+      border-radius: 1.5px;
+      flex-shrink: 0;
+    }
+
+    .box-outline {
+      width: 7px;
+      height: 7px;
+      border: 1px solid #ccc0b0;
+      border-radius: 1px;
+      flex-shrink: 0;
+    }
+
+    .task-text {
+      font-size: 7.5px;
+      color: #4a3f35;
+      font-weight: 300;
+    }
+
+    /* Free-form checkboxes: empty box + blank underline */
+    .free-task {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+
+    .free-line {
+      flex: 1;
+      height: 1px;
+      background: #ddd5c5;
+    }
+
+    /* Note lines */
+    .note-line {
+      height: 1px;
+      background: #f0ebe2;
+      margin-bottom: 7.5px;
+    }
+
+    /* Habit tracker shared */
+    .habit-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* Day header row */
+    .day-header {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 4px;
+      padding-left: 72px;
+    }
+
+    .day-letter {
+      width: 22px;
+      text-align: center;
+      font-size: 5.5px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #b0a090;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    /* Habit row: name line + 7 circles */
+    .habit-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 5px;
+    }
+
+    .habit-name-line {
+      width: 68px;
+      height: 1px;
+      background: #ddd5c5;
+      margin-right: 4px;
+      flex-shrink: 0;
+    }
+
+    .habit-circle {
+      width: 22px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .circle-empty {
+      width: 8px;
+      height: 8px;
+      border: 1px solid #c8b89a;
+      border-radius: 50%;
+    }
+
+    .circle-sq {
+      width: 7px;
+      height: 7px;
+      border: 1px solid #c8b89a;
+      border-radius: 1px;
+    }
+
+    .circle-dot {
+      width: 5px;
+      height: 5px;
+      border: 1px solid #b0a090;
+      border-radius: 50%;
+    }
+
+    /* Gaps */
+    .gap-sm { margin-top: 8px; }
+    .gap-xs { margin-top: 5px; }
+
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <h1>Pregnancy Planner — A, Iterated</h1>
+    <p>Thinner header · free-form checkboxes · habit tracker</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- ══════════════════════════════
+         ITERATION 1
+         Tall-ish band, circle tracker,
+         free boxes mid-page
+    ══════════════════════════════ -->
+    <div class="col">
+      <div class="page">
+
+        <div class="band band-tall">
+          <span class="week">Week 18</span>
+          <div class="sep"></div>
+          <span class="trim">Second Trimester</span>
+        </div>
+
+        <div class="body">
+
+          <!-- Suggested tasks -->
+          <div class="sec-row">
+            <div class="sec-label">This Week</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="task"><div class="box-clay"></div><div class="task-text">Book anomaly scan</div></div>
+          <div class="task"><div class="box-clay"></div><div class="task-text">Research prams</div></div>
+          <div class="free-task"><div class="box-outline"></div><div class="free-line"></div></div>
+          <div class="free-task"><div class="box-outline"></div><div class="free-line"></div></div>
+          <div class="free-task"><div class="box-outline"></div><div class="free-line"></div></div>
+
+          <!-- Habit tracker -->
+          <div class="gap-sm"></div>
+          <div class="sec-row">
+            <div class="sec-label">Habits</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="day-header">
+            <div class="day-letter">M</div>
+            <div class="day-letter">T</div>
+            <div class="day-letter">W</div>
+            <div class="day-letter">T</div>
+            <div class="day-letter">F</div>
+            <div class="day-letter">S</div>
+            <div class="day-letter">S</div>
+          </div>
+          <div class="habit-grid">
+            <div class="habit-row">
+              <div class="habit-name-line"></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+            </div>
+            <div class="habit-row">
+              <div class="habit-name-line"></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+            </div>
+            <div class="habit-row">
+              <div class="habit-name-line"></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+              <div class="habit-circle"><div class="circle-empty"></div></div>
+            </div>
+          </div>
+
+          <!-- Feeling -->
+          <div class="gap-sm"></div>
+          <div class="sec-row">
+            <div class="sec-label">How are you feeling?</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+
+        </div>
+      </div>
+      <div class="variant-name">i — Circles</div>
+      <div class="variant-desc">Standard band height (30px). Open circles for habit tracker.</div>
+    </div>
+
+
+    <!-- ══════════════════════════════
+         ITERATION 2
+         Slimmer band, square tracker,
+         free boxes at bottom of tasks
+    ══════════════════════════════ -->
+    <div class="col">
+      <div class="page">
+
+        <div class="band band-slim">
+          <span class="week">Week 18</span>
+          <div class="sep"></div>
+          <span class="trim">Second Trimester</span>
+        </div>
+
+        <div class="body">
+
+          <!-- Suggested -->
+          <div class="sec-row">
+            <div class="sec-label">This Week</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="task"><div class="box-clay"></div><div class="task-text">Book anomaly scan</div></div>
+          <div class="task"><div class="box-clay"></div><div class="task-text">Research prams</div></div>
+          <div class="task"><div class="box-clay"></div><div class="task-text">Birth preferences</div></div>
+          <div class="free-task"><div class="box-outline"></div><div class="free-line"></div></div>
+          <div class="free-task"><div class="box-outline"></div><div class="free-line"></div></div>
+          <div class="free-task"><div class="box-outline"></div><div class="free-line"></div></div>
+
+          <!-- Habit tracker — square boxes -->
+          <div class="gap-sm"></div>
+          <div class="sec-row">
+            <div class="sec-label">Habits</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="day-header">
+            <div class="day-letter">M</div>
+            <div class="day-letter">T</div>
+            <div class="day-letter">W</div>
+            <div class="day-letter">T</div>
+            <div class="day-letter">F</div>
+            <div class="day-letter">S</div>
+            <div class="day-letter">S</div>
+          </div>
+          <div class="habit-grid">
+            <div class="habit-row">
+              <div class="habit-name-line"></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+            </div>
+            <div class="habit-row">
+              <div class="habit-name-line"></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+            </div>
+            <div class="habit-row">
+              <div class="habit-name-line"></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+            </div>
+            <div class="habit-row">
+              <div class="habit-name-line"></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+              <div class="habit-circle"><div class="circle-sq"></div></div>
+            </div>
+          </div>
+
+          <!-- Feeling -->
+          <div class="gap-sm"></div>
+          <div class="sec-row">
+            <div class="sec-label">How are you feeling?</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+
+        </div>
+      </div>
+      <div class="variant-name">ii — Squares</div>
+      <div class="variant-desc">Slimmer band (22px). Square habit boxes. 4 habit rows.</div>
+    </div>
+
+
+    <!-- ══════════════════════════════
+         ITERATION 3
+         Stripe band, dot tracker,
+         notes section instead of feeling
+    ══════════════════════════════ -->
+    <div class="col">
+      <div class="page">
+
+        <div class="band band-stripe">
+          <span class="week" style="font-size:8px;">Week 18</span>
+          <div class="sep"></div>
+          <span class="trim" style="font-size:6px;">Second Trimester</span>
+        </div>
+
+        <div class="body" style="padding-top:15px;">
+
+          <!-- Suggested -->
+          <div class="sec-row">
+            <div class="sec-label">This Week</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="task"><div class="box-clay"></div><div class="task-text">Book anomaly scan</div></div>
+          <div class="task"><div class="box-clay"></div><div class="task-text">Research prams</div></div>
+          <div class="task"><div class="box-clay"></div><div class="task-text">Start birth preferences</div></div>
+          <div class="free-task"><div class="box-outline"></div><div class="free-line"></div></div>
+          <div class="free-task"><div class="box-outline"></div><div class="free-line"></div></div>
+          <div class="free-task"><div class="box-outline"></div><div class="free-line"></div></div>
+          <div class="free-task"><div class="box-outline"></div><div class="free-line"></div></div>
+
+          <!-- Habit tracker — tiny dots -->
+          <div class="gap-sm"></div>
+          <div class="sec-row">
+            <div class="sec-label">Habits</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="day-header" style="padding-left:74px;">
+            <div class="day-letter" style="width:18px;">M</div>
+            <div class="day-letter" style="width:18px;">T</div>
+            <div class="day-letter" style="width:18px;">W</div>
+            <div class="day-letter" style="width:18px;">T</div>
+            <div class="day-letter" style="width:18px;">F</div>
+            <div class="day-letter" style="width:18px;">S</div>
+            <div class="day-letter" style="width:18px;">S</div>
+          </div>
+          <div class="habit-grid">
+            <div class="habit-row" style="margin-bottom:6px;">
+              <div class="habit-name-line" style="width:70px; margin-right:4px;"></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+            </div>
+            <div class="habit-row" style="margin-bottom:6px;">
+              <div class="habit-name-line" style="width:70px; margin-right:4px;"></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+            </div>
+            <div class="habit-row" style="margin-bottom:6px;">
+              <div class="habit-name-line" style="width:70px; margin-right:4px;"></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+            </div>
+            <div class="habit-row" style="margin-bottom:6px;">
+              <div class="habit-name-line" style="width:70px; margin-right:4px;"></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+              <div class="habit-circle" style="width:18px;"><div class="circle-dot"></div></div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="gap-sm"></div>
+          <div class="sec-row">
+            <div class="sec-label">Notes</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+
+        </div>
+      </div>
+      <div class="variant-name">iii — Dots</div>
+      <div class="variant-desc">Very thin stripe (14px). Tiny dot tracker. 4 free-form boxes. More breathing room.</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

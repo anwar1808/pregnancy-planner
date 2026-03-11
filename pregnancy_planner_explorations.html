@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pregnancy Planner – Style Explorations</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #ede9e3;
+      font-family: 'Inter', sans-serif;
+      padding: 48px 24px 64px;
+      min-height: 100vh;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+
+    .page-header h1 {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 6px;
+    }
+
+    .page-header p {
+      font-size: 11px;
+      color: #aaa;
+      letter-spacing: 0.05em;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 36px;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    .style-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* iPad portrait 3:4 */
+    .page {
+      width: 240px;
+      height: 320px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      flex-shrink: 0;
+    }
+
+    .page:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.15) !important;
+    }
+
+    .variant-name {
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: 12.5px;
+      color: #555;
+      letter-spacing: 0.05em;
+      text-align: center;
+    }
+
+    .variant-desc {
+      font-size: 10.5px;
+      color: #999;
+      text-align: center;
+      line-height: 1.6;
+      max-width: 210px;
+    }
+
+    .swatches {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+
+    /* ═══════════════════════════════════
+       VARIANT A — White Sage
+       Sage green header band, white body,
+       warm clay accents, Inter
+    ═══════════════════════════════════ */
+    .va {
+      background: #ffffff;
+      box-shadow: 0 4px 24px rgba(80,100,80,0.1);
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      border-radius: 3px;
+    }
+
+    .va .top-band {
+      background: #7a9e7e;
+      padding: 18px 22px 15px;
+      flex-shrink: 0;
+    }
+
+    .va .pre-label {
+      font-size: 7px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 3px;
+    }
+
+    .va .week-num {
+      font-size: 21px;
+      font-weight: 300;
+      color: #fff;
+      letter-spacing: -0.3px;
+      line-height: 1;
+    }
+
+    .va .trimester {
+      font-size: 7px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-top: 5px;
+    }
+
+    .va .body {
+      padding: 16px 22px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 0;
+    }
+
+    .va .sec-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .va .sec-label {
+      font-size: 6.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #a09080;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .va .sec-line {
+      flex: 1;
+      height: 1px;
+      background: #e8e0d4;
+    }
+
+    .va .task {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 5.5px;
+    }
+
+    .va .box {
+      width: 8px;
+      height: 8px;
+      border: 1.5px solid #c4956a;
+      border-radius: 1.5px;
+      flex-shrink: 0;
+    }
+
+    .va .task-text {
+      font-size: 7.5px;
+      color: #4a3f35;
+      font-weight: 300;
+    }
+
+    .va .note-line {
+      height: 1px;
+      background: #f0ebe2;
+      margin-bottom: 8px;
+    }
+
+    .va .gap { margin-top: 10px; }
+
+
+    /* ═══════════════════════════════════
+       VARIANT B — Terracotta Thin
+       White background, terracotta left
+       accent bar, very minimal layout,
+       Jost / Inter
+    ═══════════════════════════════════ */
+    .vb {
+      background: #ffffff;
+      box-shadow: 0 4px 24px rgba(100,70,50,0.09);
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: row;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .vb .left-bar {
+      width: 5px;
+      background: #c4956a;
+      flex-shrink: 0;
+    }
+
+    .vb .content {
+      padding: 22px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 0;
+    }
+
+    .vb .pre-label {
+      font-size: 7px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: #c4956a;
+      margin-bottom: 3px;
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+    }
+
+    .vb .week-num {
+      font-family: 'Jost', sans-serif;
+      font-size: 28px;
+      font-weight: 200;
+      color: #2a2018;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .vb .trimester {
+      font-size: 7px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #b0a090;
+      margin-top: 4px;
+      margin-bottom: 16px;
+    }
+
+    .vb .divider {
+      height: 1px;
+      background: #f0ebe2;
+      margin-bottom: 14px;
+    }
+
+    .vb .sec-label {
+      font-size: 6.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #7a9e7e;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .vb .task {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 5.5px;
+    }
+
+    .vb .circle {
+      width: 7px;
+      height: 7px;
+      border: 1.5px solid #c4956a;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .vb .task-text {
+      font-size: 7.5px;
+      color: #4a3f35;
+      font-weight: 300;
+    }
+
+    .vb .note-line {
+      height: 1px;
+      background: #f0ebe2;
+      margin-bottom: 8px;
+    }
+
+    .vb .gap { margin-top: 12px; }
+
+
+    /* ═══════════════════════════════════
+       VARIANT C — Warm Editorial
+       White background, Playfair Display
+       for week number, sage green accents,
+       very refined feel
+    ═══════════════════════════════════ */
+    .vc {
+      background: #ffffff;
+      box-shadow: 0 4px 24px rgba(80,70,60,0.1);
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      flex-direction: column;
+      border-radius: 3px;
+    }
+
+    .vc .top {
+      padding: 22px 22px 0;
+      border-bottom: 1px solid #ede8e0;
+      padding-bottom: 16px;
+    }
+
+    .vc .pre-label {
+      font-size: 6.5px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #7a9e7e;
+      margin-bottom: 3px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .vc .week-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 400;
+      font-style: italic;
+      color: #2a2018;
+      line-height: 1;
+    }
+
+    .vc .trimester {
+      font-size: 7px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #bbb0a0;
+      margin-top: 5px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+    }
+
+    .vc .body {
+      padding: 16px 22px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .vc .sec-label {
+      font-size: 6.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #a09080;
+      margin-bottom: 8px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+    }
+
+    .vc .task {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 5.5px;
+    }
+
+    .vc .box {
+      width: 8px;
+      height: 8px;
+      border: 1px solid #c8b89a;
+      border-radius: 1px;
+      flex-shrink: 0;
+    }
+
+    .vc .task-text {
+      font-size: 7.5px;
+      color: #4a3f35;
+      font-weight: 300;
+    }
+
+    .vc .section-accent {
+      width: 20px;
+      height: 2px;
+      background: #7a9e7e;
+      margin: 12px 0 8px;
+      border-radius: 1px;
+    }
+
+    .vc .note-line {
+      height: 1px;
+      background: #f0ebe2;
+      margin-bottom: 8.5px;
+    }
+
+
+    /* ═══════════════════════════════════
+       VARIANT D — Ground & Grain
+       White bg, oat/grain texture feel,
+       all earthy tones as type/lines,
+       no coloured band — most minimal
+    ═══════════════════════════════════ */
+    .vd {
+      background: #ffffff;
+      box-shadow: 0 4px 24px rgba(80,70,60,0.1);
+      font-family: 'Cormorant Garamond', serif;
+      display: flex;
+      flex-direction: column;
+      border-radius: 3px;
+    }
+
+    .vd .top-rule {
+      height: 3px;
+      background: linear-gradient(to right, #7a9e7e, #c4956a);
+      flex-shrink: 0;
+    }
+
+    .vd .top {
+      padding: 20px 22px 14px;
+      border-bottom: 1px solid #ede8e0;
+    }
+
+    .vd .pre-label {
+      font-size: 7px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #b0a090;
+      margin-bottom: 3px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+    }
+
+    .vd .week-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 300;
+      color: #2a2018;
+      letter-spacing: 0.5px;
+      line-height: 1;
+    }
+
+    .vd .trimester {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 10px;
+      font-style: italic;
+      color: #9a8a78;
+      margin-top: 3px;
+    }
+
+    .vd .body {
+      padding: 14px 22px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .vd .sec-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .vd .sec-label {
+      font-size: 6.5px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #7a9e7e;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .vd .sec-line {
+      flex: 1;
+      height: 1px;
+      background: #ede8e0;
+    }
+
+    .vd .task {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 5.5px;
+    }
+
+    .vd .leaf {
+      width: 7px;
+      height: 7px;
+      border: 1.5px solid #7a9e7e;
+      border-radius: 50% 0 50% 0;
+      flex-shrink: 0;
+      transform: rotate(45deg);
+    }
+
+    .vd .task-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 9.5px;
+      color: #4a3f35;
+      font-weight: 300;
+    }
+
+    .vd .note-line {
+      height: 1px;
+      background: #f0ebe2;
+      margin-bottom: 8.5px;
+    }
+
+    .vd .gap { margin-top: 10px; }
+    .vd .bottom-rule {
+      height: 2px;
+      background: #ede8e0;
+      margin-top: auto;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <h1>Pregnancy Planner — Explorations</h1>
+    <p>Clean & Minimal × Neutral & Earthy &nbsp;·&nbsp; white background &nbsp;·&nbsp; leaning earthy</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- VARIANT A: White Sage -->
+    <div class="style-col">
+      <div class="page va">
+        <div class="top-band">
+          <div class="pre-label">Currently</div>
+          <div class="week-num">Week 18</div>
+          <div class="trimester">Second Trimester</div>
+        </div>
+        <div class="body">
+          <div class="sec-row">
+            <div class="sec-label">This Week</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="task"><div class="box"></div><div class="task-text">Book anomaly scan</div></div>
+          <div class="task"><div class="box"></div><div class="task-text">Research prams</div></div>
+          <div class="task"><div class="box"></div><div class="task-text">Start birth preferences</div></div>
+
+          <div class="gap"></div>
+          <div class="sec-row">
+            <div class="sec-label">Notes</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+
+          <div class="sec-row" style="margin-top:6px;">
+            <div class="sec-label">How are you feeling?</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+        </div>
+      </div>
+      <div class="variant-name">A — White Sage</div>
+      <div class="swatches">
+        <div class="swatch" style="background:#7a9e7e;"></div>
+        <div class="swatch" style="background:#c4956a;"></div>
+        <div class="swatch" style="background:#ffffff; border-color:#ddd;"></div>
+        <div class="swatch" style="background:#e8e0d4;"></div>
+      </div>
+      <div class="variant-desc">Sage green header band, white body. Clay checkboxes. Clean Inter type.</div>
+    </div>
+
+    <!-- VARIANT B: Terracotta Thin -->
+    <div class="style-col">
+      <div class="page vb">
+        <div class="left-bar"></div>
+        <div class="content">
+          <div class="pre-label">Currently</div>
+          <div class="week-num">18</div>
+          <div class="trimester">Second Trimester</div>
+          <div class="divider"></div>
+          <div class="sec-label">This Week</div>
+          <div class="task"><div class="circle"></div><div class="task-text">Book anomaly scan</div></div>
+          <div class="task"><div class="circle"></div><div class="task-text">Research prams</div></div>
+          <div class="task"><div class="circle"></div><div class="task-text">Birth preferences</div></div>
+          <div class="gap"></div>
+          <div class="sec-label">Notes</div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="gap"></div>
+          <div class="sec-label">How are you feeling?</div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+        </div>
+      </div>
+      <div class="variant-name">B — Terracotta Thin</div>
+      <div class="swatches">
+        <div class="swatch" style="background:#c4956a;"></div>
+        <div class="swatch" style="background:#7a9e7e;"></div>
+        <div class="swatch" style="background:#ffffff; border-color:#ddd;"></div>
+      </div>
+      <div class="variant-desc">Terracotta side accent bar, large Jost numerals, very stripped back.</div>
+    </div>
+
+    <!-- VARIANT C: Warm Editorial -->
+    <div class="style-col">
+      <div class="page vc">
+        <div class="top">
+          <div class="pre-label">Currently</div>
+          <div class="week-num">Week 18</div>
+          <div class="trimester">Second Trimester</div>
+        </div>
+        <div class="body">
+          <div class="sec-label">This Week</div>
+          <div class="task"><div class="box"></div><div class="task-text">Book anomaly scan</div></div>
+          <div class="task"><div class="box"></div><div class="task-text">Research prams</div></div>
+          <div class="task"><div class="box"></div><div class="task-text">Start birth preferences</div></div>
+
+          <div class="section-accent"></div>
+          <div class="sec-label">Notes</div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+
+          <div class="section-accent"></div>
+          <div class="sec-label">How are you feeling?</div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+        </div>
+      </div>
+      <div class="variant-name">C — Warm Editorial</div>
+      <div class="swatches">
+        <div class="swatch" style="background:#7a9e7e;"></div>
+        <div class="swatch" style="background:#c8b89a;"></div>
+        <div class="swatch" style="background:#ffffff; border-color:#ddd;"></div>
+        <div class="swatch" style="background:#2a2018;"></div>
+      </div>
+      <div class="variant-desc">Playfair italic week number. Sage green accents. DM Sans body. Refined.</div>
+    </div>
+
+    <!-- VARIANT D: Ground & Grain -->
+    <div class="style-col">
+      <div class="page vd">
+        <div class="top-rule"></div>
+        <div class="top">
+          <div class="pre-label">Currently</div>
+          <div class="week-num">Week 18</div>
+          <div class="trimester">Second Trimester</div>
+        </div>
+        <div class="body">
+          <div class="sec-row">
+            <div class="sec-label">This Week</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="task"><div class="leaf"></div><div class="task-text">Book anomaly scan</div></div>
+          <div class="task"><div class="leaf"></div><div class="task-text">Research prams</div></div>
+          <div class="task"><div class="leaf"></div><div class="task-text">Start birth preferences</div></div>
+
+          <div class="gap"></div>
+          <div class="sec-row">
+            <div class="sec-label">Notes</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+
+          <div class="sec-row" style="margin-top:8px;">
+            <div class="sec-label">How are you feeling?</div>
+            <div class="sec-line"></div>
+          </div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+        </div>
+      </div>
+      <div class="variant-name">D — Ground & Grain</div>
+      <div class="swatches">
+        <div class="swatch" style="background:#7a9e7e;"></div>
+        <div class="swatch" style="background:#c4956a;"></div>
+        <div class="swatch" style="background:#ffffff; border-color:#ddd;"></div>
+        <div class="swatch" style="background:#2a2018;"></div>
+      </div>
+      <div class="variant-desc">Sage–clay gradient top rule. Cormorant Garamond type. Leaf markers. Most earthy.</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

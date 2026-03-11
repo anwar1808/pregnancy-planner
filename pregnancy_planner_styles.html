@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pregnancy Planner – Style Options</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Nunito:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #f0ede8;
+      font-family: 'Inter', sans-serif;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 12px;
+      color: #aaa;
+      margin-bottom: 48px;
+      letter-spacing: 0.05em;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .style-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .label {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: #666;
+    }
+
+    /* iPad portrait ratio = 3:4 */
+    .page {
+      width: 240px;
+      height: 320px;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .page:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+    }
+
+    /* ───── STYLE 1: CLEAN & MINIMAL ───── */
+    .minimal {
+      background: #ffffff;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      font-family: 'Inter', sans-serif;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .minimal .week-label {
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 4px;
+    }
+
+    .minimal .week-number {
+      font-size: 22px;
+      font-weight: 300;
+      color: #1a1a1a;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+
+    .minimal .trimester {
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #bbb;
+      margin-top: 4px;
+      margin-bottom: 18px;
+    }
+
+    .minimal .divider {
+      height: 1px;
+      background: #e8e8e8;
+      margin-bottom: 16px;
+    }
+
+    .minimal .section-title {
+      font-size: 7.5px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .minimal .task-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 6px;
+    }
+
+    .minimal .checkbox {
+      width: 8px;
+      height: 8px;
+      border: 1px solid #ccc;
+      border-radius: 1px;
+      flex-shrink: 0;
+    }
+
+    .minimal .task-text {
+      font-size: 8px;
+      color: #444;
+      font-weight: 300;
+    }
+
+    .minimal .notes-area {
+      margin-top: 14px;
+    }
+
+    .minimal .note-line {
+      height: 1px;
+      background: #f0f0f0;
+      margin-bottom: 8px;
+    }
+
+    .minimal .feeling-label {
+      font-size: 7.5px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #bbb;
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+
+    /* ───── STYLE 2: SOFT & PASTEL ───── */
+    .pastel {
+      background: #fef6f8;
+      box-shadow: 0 4px 20px rgba(200,150,170,0.15);
+      font-family: 'Nunito', sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pastel .header-band {
+      background: linear-gradient(135deg, #f4c2d0, #d4b8e8);
+      padding: 20px 22px 16px;
+    }
+
+    .pastel .week-label {
+      font-size: 8px;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.8);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .pastel .week-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-style: italic;
+      color: white;
+      line-height: 1.1;
+    }
+
+    .pastel .trimester-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.3);
+      color: white;
+      font-size: 7px;
+      letter-spacing: 0.1em;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-top: 6px;
+    }
+
+    .pastel .body {
+      padding: 16px 22px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .pastel .section-title {
+      font-size: 7.5px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #c490a8;
+      margin-bottom: 8px;
+    }
+
+    .pastel .task-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 6px;
+    }
+
+    .pastel .dot {
+      width: 8px;
+      height: 8px;
+      border: 1.5px solid #e4a8c0;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .pastel .task-text {
+      font-size: 8px;
+      color: #886070;
+      font-weight: 300;
+    }
+
+    .pastel .wave-divider {
+      font-size: 10px;
+      color: #e4c0cc;
+      letter-spacing: 3px;
+      margin: 10px 0;
+      text-align: center;
+    }
+
+    .pastel .note-line {
+      height: 1px;
+      background: linear-gradient(to right, #f4c2d0, #d4b8e8);
+      margin-bottom: 9px;
+      opacity: 0.5;
+    }
+
+    .pastel .heart {
+      color: #e4a8c0;
+      font-size: 10px;
+    }
+
+    /* ───── STYLE 3: NEUTRAL & EARTHY ───── */
+    .earthy {
+      background: #f7f2ea;
+      box-shadow: 0 4px 20px rgba(100,80,60,0.12);
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .earthy .header-band {
+      background: #7a9e7e;
+      padding: 20px 22px 16px;
+    }
+
+    .earthy .week-label {
+      font-size: 7.5px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 3px;
+    }
+
+    .earthy .week-number {
+      font-size: 22px;
+      font-weight: 300;
+      color: #fff;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+
+    .earthy .trimester {
+      font-size: 7.5px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-top: 5px;
+    }
+
+    .earthy .body {
+      padding: 16px 22px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .earthy .section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 9px;
+      margin-top: 4px;
+    }
+
+    .earthy .section-line {
+      flex: 1;
+      height: 1px;
+      background: #c8b89a;
+    }
+
+    .earthy .section-title {
+      font-size: 7px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #9a8570;
+      font-weight: 500;
+    }
+
+    .earthy .task-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 6px;
+    }
+
+    .earthy .checkbox {
+      width: 8px;
+      height: 8px;
+      border: 1.5px solid #c4956a;
+      border-radius: 1px;
+      flex-shrink: 0;
+    }
+
+    .earthy .task-text {
+      font-size: 8px;
+      color: #5c4a35;
+      font-weight: 300;
+    }
+
+    .earthy .note-line {
+      height: 1px;
+      background: #ddd4c4;
+      margin-bottom: 9px;
+    }
+
+    /* ───── STYLE 4: DARK & ELEGANT ───── */
+    .elegant {
+      background: #1a2744;
+      box-shadow: 0 4px 20px rgba(10,20,50,0.35);
+      font-family: 'Cormorant Garamond', serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .elegant .header-band {
+      border-bottom: 1px solid rgba(201,168,76,0.3);
+      padding: 22px 24px 18px;
+    }
+
+    .elegant .week-label {
+      font-size: 7.5px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #c9a84c;
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      margin-bottom: 4px;
+    }
+
+    .elegant .week-number {
+      font-size: 26px;
+      font-weight: 400;
+      color: #f5f0e0;
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+
+    .elegant .trimester {
+      font-size: 9px;
+      font-style: italic;
+      color: rgba(245,240,224,0.45);
+      margin-top: 4px;
+    }
+
+    .elegant .body {
+      padding: 18px 24px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .elegant .section-title {
+      font-size: 7px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: #c9a84c;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      margin-bottom: 10px;
+    }
+
+    .elegant .task-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
+
+    .elegant .diamond {
+      width: 6px;
+      height: 6px;
+      border: 1px solid #c9a84c;
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+
+    .elegant .task-text {
+      font-size: 9px;
+      color: rgba(245,240,224,0.7);
+      font-weight: 300;
+    }
+
+    .elegant .gold-line {
+      height: 1px;
+      background: linear-gradient(to right, rgba(201,168,76,0.4), transparent);
+      margin: 12px 0;
+    }
+
+    .elegant .note-line {
+      height: 1px;
+      background: rgba(245,240,224,0.08);
+      margin-bottom: 9px;
+    }
+
+    .elegant .feeling-label {
+      font-size: 7px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: #c9a84c;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      margin-bottom: 8px;
+    }
+
+    /* Palette swatches */
+    .swatches {
+      display: flex;
+      gap: 5px;
+      margin-top: 4px;
+    }
+
+    .swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .style-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: #444;
+      text-align: center;
+    }
+
+    .style-desc {
+      font-size: 10.5px;
+      color: #888;
+      text-align: center;
+      line-height: 1.5;
+      max-width: 210px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Pregnancy Planner</h1>
+  <p class="subtitle">Style options — hover to see shadow lift</p>
+
+  <div class="grid">
+
+    <!-- STYLE 1: CLEAN & MINIMAL -->
+    <div class="style-col">
+      <div class="page minimal">
+        <div class="week-label">Currently</div>
+        <div class="week-number">Week 18</div>
+        <div class="trimester">Second Trimester</div>
+        <div class="divider"></div>
+
+        <div class="section-title">This Week</div>
+        <div class="task-item"><div class="checkbox"></div><div class="task-text">Book anomaly scan</div></div>
+        <div class="task-item"><div class="checkbox"></div><div class="task-text">Research prams</div></div>
+        <div class="task-item"><div class="checkbox"></div><div class="task-text">Start birth preferences</div></div>
+
+        <div class="notes-area">
+          <div class="section-title">Notes</div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+        </div>
+
+        <div class="feeling-label">How are you feeling?</div>
+        <div class="note-line"></div>
+        <div class="note-line"></div>
+      </div>
+      <div class="style-name">Clean & Minimal</div>
+      <div class="swatches">
+        <div class="swatch" style="background:#ffffff; border-color:#ddd;"></div>
+        <div class="swatch" style="background:#1a1a1a;"></div>
+        <div class="swatch" style="background:#e8e8e8;"></div>
+      </div>
+      <div class="style-desc">White space, thin lines, modern editorial. Calm and uncluttered.</div>
+    </div>
+
+    <!-- STYLE 2: SOFT & PASTEL -->
+    <div class="style-col">
+      <div class="page pastel">
+        <div class="header-band">
+          <div class="week-label">Currently</div>
+          <div class="week-number">Week 18</div>
+          <div class="trimester-tag">Second Trimester</div>
+        </div>
+        <div class="body">
+          <div class="section-title">This Week <span class="heart">♡</span></div>
+          <div class="task-item"><div class="dot"></div><div class="task-text">Book anomaly scan</div></div>
+          <div class="task-item"><div class="dot"></div><div class="task-text">Research prams</div></div>
+          <div class="task-item"><div class="dot"></div><div class="task-text">Start birth preferences</div></div>
+
+          <div class="wave-divider">· · · · · · · · ·</div>
+
+          <div class="section-title">Notes</div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+
+          <div class="section-title" style="margin-top:10px;">How are you feeling? <span class="heart">♡</span></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+        </div>
+      </div>
+      <div class="style-name">Soft & Pastel</div>
+      <div class="swatches">
+        <div class="swatch" style="background:#f4c2d0;"></div>
+        <div class="swatch" style="background:#d4b8e8;"></div>
+        <div class="swatch" style="background:#a8d4c0;"></div>
+        <div class="swatch" style="background:#fef6f8; border-color:#eee;"></div>
+      </div>
+      <div class="style-desc">Dusty pink, lilac, mint. Soft, warm and gentle.</div>
+    </div>
+
+    <!-- STYLE 3: NEUTRAL & EARTHY -->
+    <div class="style-col">
+      <div class="page earthy">
+        <div class="header-band">
+          <div class="week-label">Currently</div>
+          <div class="week-number">Week 18</div>
+          <div class="trimester">Second Trimester</div>
+        </div>
+        <div class="body">
+          <div class="section-header">
+            <div class="section-title">This Week</div>
+            <div class="section-line"></div>
+          </div>
+          <div class="task-item"><div class="checkbox"></div><div class="task-text">Book anomaly scan</div></div>
+          <div class="task-item"><div class="checkbox"></div><div class="task-text">Research prams</div></div>
+          <div class="task-item"><div class="checkbox"></div><div class="task-text">Start birth preferences</div></div>
+
+          <div class="section-header" style="margin-top:12px;">
+            <div class="section-title">Notes</div>
+            <div class="section-line"></div>
+          </div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+
+          <div class="section-header" style="margin-top:6px;">
+            <div class="section-title">How are you feeling?</div>
+            <div class="section-line"></div>
+          </div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+        </div>
+      </div>
+      <div class="style-name">Neutral & Earthy</div>
+      <div class="swatches">
+        <div class="swatch" style="background:#7a9e7e;"></div>
+        <div class="swatch" style="background:#c4956a;"></div>
+        <div class="swatch" style="background:#f7f2ea;"></div>
+        <div class="swatch" style="background:#c8b89a;"></div>
+      </div>
+      <div class="style-desc">Sage green, oat, warm clay. Gender-neutral and grounded.</div>
+    </div>
+
+    <!-- STYLE 4: DARK & ELEGANT -->
+    <div class="style-col">
+      <div class="page elegant">
+        <div class="header-band">
+          <div class="week-label">Currently</div>
+          <div class="week-number">Week 18</div>
+          <div class="trimester">Second Trimester</div>
+        </div>
+        <div class="body">
+          <div class="section-title">This Week</div>
+          <div class="task-item"><div class="diamond"></div><div class="task-text">Book anomaly scan</div></div>
+          <div class="task-item"><div class="diamond"></div><div class="task-text">Research prams</div></div>
+          <div class="task-item"><div class="diamond"></div><div class="task-text">Start birth preferences</div></div>
+
+          <div class="gold-line"></div>
+
+          <div class="section-title">Notes</div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+
+          <div class="feeling-label">How are you feeling?</div>
+          <div class="note-line"></div>
+          <div class="note-line"></div>
+        </div>
+      </div>
+      <div class="style-name">Dark & Elegant</div>
+      <div class="swatches">
+        <div class="swatch" style="background:#1a2744;"></div>
+        <div class="swatch" style="background:#c9a84c;"></div>
+        <div class="swatch" style="background:#f5f0e0;"></div>
+      </div>
+      <div class="style-desc">Deep navy, gold accents, cream. Sophisticated and premium.</div>
+    </div>
+
+  </div>
+
+</body>
+</html>
