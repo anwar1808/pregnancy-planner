@@ -14,7 +14,25 @@ A calm, hyperlinked pregnancy planning PDF covering Weeks 4–40. 88 pages. Desi
 |---|---|---|
 | v1 | `generate_planner_v1.py` | `pregnancy_planner_2026_v1.pdf` |
 | v2 | `generate_planner.py` | `pregnancy_planner_2026_v2.pdf` |
-| v3 (current) | `generate_planner_v3.py` | `pregnancy_planner_2026_v3.pdf` |
+| v3 | `generate_planner_v3.py` | `pregnancy_planner_2026_v3.pdf` |
+| v4 (current) | `generate_planner_v4.py` | `pregnancy_planner_2026_v4.pdf` |
+
+### What changed in v4 (review notes on v3)
+
+- Removed the horizontal icon nav strip (side tabs kept).
+- Reference-inspired refresh: letter-spaced serif display titles, muted
+  sage / navy / rose accents, and a single delicate botanical sprig
+  replacing every old decorative graphic (cover + all title pages).
+- Weekly pages: title is now "Weekly Planner"; the seven days stretch the
+  full page height (no "Daily Planner" header); larger section titles
+  close to their blocks; portrait "Progress Photo" box; the to-do column
+  carries Actions + Research + Consider from the Excel.
+- Bullets aligned to text throughout; appointment "Questions to ask" is
+  bulleted; scan photo boxes are square; hospital-bag and baby-essentials
+  pages fill the sheet; signs-of-labour uses bullets, not checkboxes.
+- Removed the two "questions" checklist pages (now 86 pages).
+- Birth plan: subtitle "Vaginal or C-Section"; Environment is free-write;
+  "ice chips" removed; free lines after every section; C-section spaced.
 
 ## What's in v3
 
